@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Player {
+  id            String               @id @default(uuid())
+  name          String
+  pixKey        String
+  wins          Int                  @default(0)
+  matches       Int                  @default(0)
+  championships ChampionshipPlayer[]
+
+  rebuyChampionships       Championship[] @relation("RebuyPlayer")
+  firstPlaceChampionships  Championship[] @relation("FirstPlace")
+  secondPlaceChampionships Championship[] @relation("SecondPlace")
+}
+
+model Championship {
+  id        String @id @default(uuid())
+  name      String
+  entryFee  Float
+  blindTime Int
+
+  players ChampionshipPlayer[]
+
+  rebuyPlayerId String?
+  rebuyPlayer   Player? @relation("RebuyPlayer", fields: [rebuyPlayerId], references: [id])
+
+  firstPlaceId String?
+  firstPlace   Player? @relation("FirstPlace", fields: [firstPlaceId], references: [id])
+
+  secondPlaceId String?
+  secondPlace   Player? @relation("SecondPlace", fields: [secondPlaceId], references: [id])
+}
+
+model ChampionshipPlayer {
+  playerId       String
+  championshipId String
+  player         Player       @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  championship   Championship @relation(fields: [championshipId], references: [id], onDelete: Cascade)
+
+  @@id([playerId, championshipId])
+}
