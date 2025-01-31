@@ -1,8 +1,13 @@
+"use client";
+
 import Image from "next/image";
 import { Button } from "@/app/_components/ui/button";
 import { Card, CardContent } from "@/app/_components/ui/card";
+import { useRouter } from "next/navigation";
 
 export default function PokerApp() {
+  const router = useRouter();
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4">
       <Card className="w-full max-w-sm bg-[#0a0a0a] border-2 border-gray-800 rounded-[40px] overflow-hidden">
@@ -34,6 +39,7 @@ export default function PokerApp() {
               <Button
                 variant="outline"
                 className="w-full bg-white hover:bg-gray-100 text-black font-medium py-6"
+                onClick={() => router.push("/players")}
               >
                 JOGADORES
               </Button>
