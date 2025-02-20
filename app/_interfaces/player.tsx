@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-interface Player {
+interface CreatePlayer {
   name: string;
-  wins: number;
-  championships: number;
+  pixKey: string;
 }
