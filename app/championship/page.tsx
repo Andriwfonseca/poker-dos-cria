@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Button } from "@/app/_components/ui/button";
-import { Card } from "@/app/_components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -14,39 +13,41 @@ import {
 import { Input } from "@/app/_components/ui/input";
 import { Label } from "@/app/_components/ui/label";
 import BackButton from "../(home)/_components/back-button";
+import { MultiSelect } from "../_components/ui/multi-select";
+import { getPlayers } from "../_actions/get-players";
 
-const players = [
-  {
-    name: "Filipe Fonseca",
-    wins: 50,
-    championships: 38,
-  },
-  {
-    name: "Roger Digão",
-    wins: 50,
-    championships: 38,
-  },
-  {
-    name: "Fefe Zeferino",
-    wins: 50,
-    championships: 38,
-  },
-  {
-    name: "Caco Fonseca",
-    wins: 50,
-    championships: 38,
-  },
-];
+type PlayerList = {
+  value: string,
+  label: string
+}
+
 
 export default function Championship() {
-  const [price, setPrice] = useState(0);
-  const [blindTime, setBlindTime] = useState(0)
-  const [newPlayer, setNewPlayer] = useState({ name: "", pixKey: "" });
+  const [price, setPrice] = useState(5);
+  const [blindTime, setBlindTime] = useState(15)
+  const [players, setPlayers] = useState<PlayerList[]>([]);
+  const [isGetPlayerLoading, setIsGetPlayerloading] = useState(false);
+  const [selectedPlayersId, setSelectedPlayersId] = useState<string[]>([]);
+  const [isSelectPlayerModalOpen, setIsSelectPlayerModalOpen] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleGetPlayerList = async () =>{
+    setIsSelectPlayerModalOpen(true);
+    setIsGetPlayerloading(true);
 
-    console.log("Creating player:", newPlayer);
+    const players = await getPlayers();
+    const playerList = players.map((p)=> {
+      return {
+        value: p.id,
+        label: p.name
+      }
+    });
+
+    setIsGetPlayerloading(false);
+    setPlayers(playerList);
+  }
+
+  const handleSelectPlayers = (selectedValues: any) => {    
+    setSelectedPlayersId(selectedValues);
   };
 
   return (
@@ -56,11 +57,12 @@ export default function Championship() {
           CAMPEONATO
         </h1>
 
-        <Dialog>
+        <Dialog open={isSelectPlayerModalOpen} onOpenChange={setIsSelectPlayerModalOpen}>
           <DialogTrigger asChild>
             <Button
               variant="secondary"
               className="mb-6 w-full rounded-md bg-white text-base font-medium hover:bg-gray-100"
+              onClick={() => handleGetPlayerList()}
             >
               SELECIONAR PARTICIPANTES
             </Button>
@@ -72,25 +74,29 @@ export default function Championship() {
                 Selecione os participantes do campeonato.
               </DialogDescription>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Lista de jogadores</Label>
-                <Input
-                  id="name"
-                  value={newPlayer.name}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setNewPlayer({ ...newPlayer, name: e.target.value })
-                  }
-                  placeholder=""
+                <Label htmlFor="name">Lista de jogadores</Label>                
+                <MultiSelect
+                  disabled={isGetPlayerLoading}
+                  options={players}
+                  onValueChange={handleSelectPlayers}
+                  defaultValue={[]}
+                  placeholder="Selecione os participantes"
+                  variant="inverted"
+                  animation={2}
+                  maxCount={3}
                 />
               </div>
               
               <div className="flex justify-end">
-                <Button type="submit" className="bg-[#020817]">
-                  Criar
+                <Button className="bg-[#020817]" onClick={(e) => {
+                    setIsSelectPlayerModalOpen(false);
+                  }}>
+                  Selecionar
                 </Button>
               </div>
-            </form>
+            </div>
           </DialogContent>
         </Dialog>
 
@@ -119,7 +125,9 @@ export default function Championship() {
           </div>
         </div>
         <div className="mt-16 flex justify-center">
-          <Button className="w-48 h-24 bg-[#509B52] hover:bg-green-600 transition-colors duration-200">
+          <Button 
+          className="w-48 h-24 text-4xl bg-[#509B52] hover:bg-green-600 transition-colors duration-200"
+          onClick={()=> console.log(selectedPlayersId, 'selectedPlayersI')}>
             INICIAR
           </Button>
         </div>
