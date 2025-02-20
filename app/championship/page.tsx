@@ -15,39 +15,61 @@ import { Label } from "@/app/_components/ui/label";
 import BackButton from "../(home)/_components/back-button";
 import { MultiSelect } from "../_components/ui/multi-select";
 import { getPlayers } from "../_actions/get-players";
+import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
+import { createChampionship } from "../_actions/create-championship";
+import { CreateChampionship } from "../_interfaces/create-championship";
 
 type PlayerList = {
-  value: string,
-  label: string
-}
-
+  value: string;
+  label: string;
+};
 
 export default function Championship() {
   const [price, setPrice] = useState(5);
-  const [blindTime, setBlindTime] = useState(15)
+  const [blindTime, setBlindTime] = useState(15);
   const [players, setPlayers] = useState<PlayerList[]>([]);
   const [isGetPlayerLoading, setIsGetPlayerloading] = useState(false);
   const [selectedPlayersId, setSelectedPlayersId] = useState<string[]>([]);
   const [isSelectPlayerModalOpen, setIsSelectPlayerModalOpen] = useState(false);
+  const [isStartModalOpen, setIsStartModalOpen] = useState(false);
+  const [isloadingStart, setIsloadingStart] = useState(false);
+  const router = useRouter();
 
-  const handleGetPlayerList = async () =>{
+  const handleGetPlayerList = async () => {
     setIsSelectPlayerModalOpen(true);
     setIsGetPlayerloading(true);
 
     const players = await getPlayers();
-    const playerList = players.map((p)=> {
+    const playerList = players.map((p) => {
       return {
         value: p.id,
-        label: p.name
-      }
+        label: p.name,
+      };
     });
 
     setIsGetPlayerloading(false);
     setPlayers(playerList);
-  }
+  };
 
-  const handleSelectPlayers = (selectedValues: any) => {    
+  const handleSelectPlayers = (selectedValues: any) => {
     setSelectedPlayersId(selectedValues);
+  };
+
+  const handleStartChampionship = async () => {
+    setIsloadingStart(true);
+
+    const championshipPayload: CreateChampionship = {
+      name: "CAMPEONATO #1",
+      blindTime: blindTime,
+      price: price,
+      playerIds: selectedPlayersId,
+    };
+
+    const championship = await createChampionship(championshipPayload);
+    console.log(championship, "championship");
+    setIsloadingStart(false);
+    router.push(`championship/${championship.id}`);
   };
 
   return (
@@ -57,7 +79,10 @@ export default function Championship() {
           CAMPEONATO
         </h1>
 
-        <Dialog open={isSelectPlayerModalOpen} onOpenChange={setIsSelectPlayerModalOpen}>
+        <Dialog
+          open={isSelectPlayerModalOpen}
+          onOpenChange={setIsSelectPlayerModalOpen}
+        >
           <DialogTrigger asChild>
             <Button
               variant="secondary"
@@ -69,14 +94,16 @@ export default function Championship() {
           </DialogTrigger>
           <DialogContent className="mx-auto max-w-sm">
             <DialogHeader>
-              <DialogTitle className="text-xl">SELECIONAR PARTICIPANTES</DialogTitle>
+              <DialogTitle className="text-xl">
+                SELECIONAR PARTICIPANTES
+              </DialogTitle>
               <DialogDescription>
                 Selecione os participantes do campeonato.
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Lista de jogadores</Label>                
+                <Label htmlFor="name">Lista de jogadores</Label>
                 <MultiSelect
                   disabled={isGetPlayerLoading}
                   options={players}
@@ -88,11 +115,14 @@ export default function Championship() {
                   maxCount={3}
                 />
               </div>
-              
+
               <div className="flex justify-end">
-                <Button className="bg-[#020817]" onClick={(e) => {
+                <Button
+                  className="bg-[#020817]"
+                  onClick={(e) => {
                     setIsSelectPlayerModalOpen(false);
-                  }}>
+                  }}
+                >
                   Selecionar
                 </Button>
               </div>
@@ -102,7 +132,9 @@ export default function Championship() {
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label className="font-bold text-white" htmlFor="price">VALOR - R$</Label>
+            <Label className="font-bold text-white" htmlFor="price">
+              VALOR - R$
+            </Label>
             <Input
               id="price"
               value={price}
@@ -113,7 +145,9 @@ export default function Championship() {
             />
           </div>
           <div className="space-y-2">
-            <Label className="font-bold text-white" htmlFor="price">TEMPO BLIND</Label>
+            <Label className="font-bold text-white" htmlFor="price">
+              TEMPO BLIND
+            </Label>
             <Input
               id="blindTime"
               value={blindTime}
@@ -124,13 +158,50 @@ export default function Championship() {
             />
           </div>
         </div>
-        <div className="mt-16 flex justify-center">
-          <Button 
-          className="w-48 h-24 text-4xl bg-[#509B52] hover:bg-green-600 transition-colors duration-200"
-          onClick={()=> console.log(selectedPlayersId, 'selectedPlayersI')}>
-            INICIAR
-          </Button>
-        </div>
+
+        <Dialog open={isStartModalOpen} onOpenChange={setIsStartModalOpen}>
+          <DialogTrigger asChild>
+            <div className="mt-16 flex justify-center">
+              <Button
+                className="w-48 h-24 text-4xl bg-[#509B52] hover:bg-green-600 transition-colors duration-200"
+                onClick={() =>
+                  console.log(selectedPlayersId, "selectedPlayersI")
+                }
+              >
+                INICIAR
+              </Button>
+            </div>
+          </DialogTrigger>
+          <DialogContent className="mx-auto max-w-sm">
+            <DialogHeader>
+              <DialogTitle className="text-xl">
+                Deseja iniciar o campeonato?
+              </DialogTitle>
+              <DialogDescription>
+                Verifique se já selecionou todos os participantes e ajuste o
+                valor e tempo de blind.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="mt-4 flex justify-end gap-2">
+              <Button
+                variant={"ghost"}
+                disabled={isloadingStart}
+                onClick={() => setIsStartModalOpen(false)}
+              >
+                Cancelar
+              </Button>
+              <Button
+                disabled={isloadingStart}
+                onClick={handleStartChampionship}
+              >
+                {isloadingStart && <Loader2 className="animate-spin" />}
+                Iniciar
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
         <div className="mt-20">
           <BackButton url="/" title="Voltar" />
         </div>
