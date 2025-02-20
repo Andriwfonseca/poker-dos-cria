@@ -52,7 +52,7 @@ export default function Championship() {
     setPlayers(playerList);
   };
 
-  const handleSelectPlayers = (selectedValues: any) => {
+  const handleSelectPlayers = (selectedValues: string[]) => {
     setSelectedPlayersId(selectedValues);
   };
 
@@ -119,7 +119,7 @@ export default function Championship() {
               <div className="flex justify-end">
                 <Button
                   className="bg-[#020817]"
-                  onClick={(e) => {
+                  onClick={() => {
                     setIsSelectPlayerModalOpen(false);
                   }}
                 >

@@ -34,7 +34,7 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
   return (
     <div>
       {players.map((p) => (
-        <div>{p.player.name}</div>
+        <div key={p.championshipId}>{p.player.name}</div>
       ))}
     </div>
   );
