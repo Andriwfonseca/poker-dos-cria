@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Button } from "@/app/_components/ui/button";
 import { Card, CardContent } from "@/app/_components/ui/card";
 import { useRouter } from "next/navigation";
-import { LockIcon } from "lucide-react";
+import { LockIcon, MedalIcon } from "lucide-react";
 
 export default function PokerApp() {
   const router = useRouter();
@@ -50,6 +50,7 @@ export default function PokerApp() {
                 variant="outline"
                 className="w-full bg-white hover:bg-gray-100 text-black font-medium py-6"
               >
+                <MedalIcon />
                 RANKING
               </Button>
 
