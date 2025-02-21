@@ -166,7 +166,7 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
       <footer className="mx-auto max-w-md flex justify-between mt-auto py-4 gap-x-4">
         <Button
           onClick={() => setIsFinishModalOpen(true)}
-          className="rounded bg-[#509B52] hover:bg-green-600 px-4 py-2 text-white min-w-72 gap-3"
+          className="rounded bg-[#509B52] hover:bg-green-600 px-4 py-2 text-white w-44 gap-3"
         >
           FINALIZAR
         </Button>
