@@ -11,9 +11,9 @@ import {
 } from "@/app/_components/ui/select";
 import { PlayerSelectProps } from "../_interfaces/player-select-props";
 
-export function PlayerSelect({ players }: PlayerSelectProps) {
+export function PlayerSelect({ players, onValueChange }: PlayerSelectProps) {
   return (
-    <Select>
+    <Select onValueChange={onValueChange}>
       <SelectTrigger className="w-[180px]">
         <SelectValue placeholder="Selecione um jogador" />
       </SelectTrigger>

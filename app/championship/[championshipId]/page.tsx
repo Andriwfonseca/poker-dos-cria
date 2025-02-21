@@ -18,7 +18,6 @@ import { useRouter } from "next/navigation";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { Label } from "@/app/_components/ui/label";
 import { PlayerSelect } from "@/app/_components/player-select";
-import { PlayerSelectProps } from "@/app/_interfaces/player-select-props";
 
 interface ChampionshipIdPageProps {
   params: Promise<{
@@ -35,12 +34,17 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
   const [level, setLevel] = useState(0);
   const [isStartModalOpen, setIsStartModalOpen] = useState(true);
-  const [isStarted, setIsStarted] = useState(false);
   const [isFinishModalOpen, setIsFinishModalOpen] = useState(false);
   const [isReentryModalOpen, setIsReentryModalOpen] = useState(false);
   const [playerList, setPlayerList] = useState<
     { title: string; value: string }[]
   >([{ title: "", value: "" }]);
+  const [selectedPlayerReentry, setSelectedPlayerReentry] =
+    useState<string>("");
+  const [selectedPlayerFirstPlace, setSelectedPlayerFirstPlace] =
+    useState<string>("");
+  const [selectedPlayerSecondPlace, setSelectedPlayerSecondPlace] =
+    useState<string>("");
 
   const router = useRouter();
 
@@ -103,9 +107,30 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
     }
   };
 
-  const handleFinishChampionship = () => {};
+  const handlePlayerReentryChange = (value: string) => {
+    setSelectedPlayerReentry(value);
+    console.log("Jogador selecionado reentrada", selectedPlayerReentry);
+  };
 
-  const handleReentry = () => {};
+  const handlePlayerFirstPlaceChange = (value: string) => {
+    setSelectedPlayerFirstPlace(value);
+    console.log(
+      "Jogador selecionado primeiro lugar:",
+      selectedPlayerFirstPlace
+    );
+  };
+
+  const handlePlayerSecondPlaceChange = (value: string) => {
+    setSelectedPlayerSecondPlace(value);
+    console.log(
+      "Jogador selecionado segundo lugar:",
+      selectedPlayerSecondPlace
+    );
+  };
+
+  /* const handleFinishChampionship = () => {};
+
+  const handleReentry = () => {};*/
 
   useEffect(() => {
     return () => {
@@ -116,10 +141,10 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
   }, [intervalId]);
 
   useEffect(() => {
-    if (timer === 0 && isStarted) {
+    if (timer === 0) {
       setIsStartModalOpen(true);
     }
-  }, [timer, isStarted]);
+  }, [timer]);
 
   return (
     <div className="min-h-screen bg-[#020817] px-4 py-8 flex flex-col">
@@ -135,6 +160,8 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
           </div>
         </h1>
       </div>
+
+      {players && <div>{/**apagar depois eslint*/}</div>}
 
       <footer className="mx-auto max-w-md flex justify-between mt-auto py-4 gap-x-4">
         <Button
@@ -194,7 +221,10 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
               <Label className="pt-2" htmlFor="name">
                 Lista de jogadores
               </Label>
-              <PlayerSelect players={playerList} />
+              <PlayerSelect
+                players={playerList}
+                onValueChange={handlePlayerReentryChange}
+              />
             </div>
           </div>
 
@@ -205,7 +235,10 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
             >
               Fechar
             </Button>
-            <Button onClick={() => {}} disabled={!championship?.name}>
+            <Button
+              onClick={() => console.log(selectedPlayerReentry)}
+              disabled={!championship?.name}
+            >
               {!championship?.name && <Loader2 className="animate-spin" />}
               Confirmar
             </Button>
@@ -218,7 +251,31 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
         <DialogContent className="mx-auto max-w-sm">
           <DialogHeader>
             <DialogTitle className="text-xl">FINALIZAÇÃO</DialogTitle>
+            <DialogDescription>
+              Selecione o 1º e 2º lugar do campeonato.
+            </DialogDescription>
           </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="flex justify-between">
+              <Label className="pt-2" htmlFor="name">
+                1º Lugar
+              </Label>
+              <PlayerSelect
+                players={playerList}
+                onValueChange={handlePlayerFirstPlaceChange}
+              />
+            </div>
+            <div className="flex justify-between">
+              <Label className="pt-2" htmlFor="name">
+                2º Lugar
+              </Label>
+              <PlayerSelect
+                players={playerList}
+                onValueChange={handlePlayerSecondPlaceChange}
+              />
+            </div>
+          </div>
 
           <div className="mt-4 flex justify-between gap-2">
             <Button
