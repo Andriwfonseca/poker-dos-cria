@@ -15,6 +15,10 @@ import {
 } from "@/app/_components/ui/dialog";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { DialogDescription } from "@radix-ui/react-dialog";
+import { Label } from "@/app/_components/ui/label";
+import { PlayerSelect } from "@/app/_components/player-select";
+import { PlayerSelectProps } from "@/app/_interfaces/player-select-props";
 
 interface ChampionshipIdPageProps {
   params: Promise<{
@@ -34,6 +38,9 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
   const [isStarted, setIsStarted] = useState(false);
   const [isFinishModalOpen, setIsFinishModalOpen] = useState(false);
   const [isReentryModalOpen, setIsReentryModalOpen] = useState(false);
+  const [playerList, setPlayerList] = useState<
+    { title: string; value: string }[]
+  >([{ title: "", value: "" }]);
 
   const router = useRouter();
 
@@ -44,11 +51,18 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
 
         if (championship) {
           setChampionship(championship);
-          setTimer(championship.blindTime);
+          setTimer(championship.blindTime * 60);
         }
 
         if (championship?.players) {
           setPlayers(championship.players);
+
+          const formattedPlayerList = championship.players.map((p) => ({
+            title: p.player.name,
+            value: p.player.id,
+          }));
+
+          setPlayerList(formattedPlayerList);
         } else {
           setPlayers([]);
         }
@@ -83,7 +97,7 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
   const handleRestartTimer = () => {
     if (championship) {
       if (level < 13) setLevel((prevLevel) => prevLevel + 1);
-      setTimer(championship.blindTime);
+      setTimer(championship.blindTime * 60);
       setIsStartModalOpen(false);
       handleStartTimer();
     }
@@ -170,18 +184,30 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
         <DialogContent className="mx-auto max-w-sm">
           <DialogHeader>
             <DialogTitle className="text-xl">REENTRADA</DialogTitle>
+            <DialogDescription>
+              Selecione o participante que irá fazer a reentrada.
+            </DialogDescription>
           </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="flex justify-between">
+              <Label className="pt-2" htmlFor="name">
+                Lista de jogadores
+              </Label>
+              <PlayerSelect players={playerList} />
+            </div>
+          </div>
 
           <div className="mt-4 flex justify-between gap-2">
             <Button
               variant={"ghost"}
               onClick={() => setIsReentryModalOpen(false)}
             >
-              Sair
+              Fechar
             </Button>
             <Button onClick={() => {}} disabled={!championship?.name}>
               {!championship?.name && <Loader2 className="animate-spin" />}
-              Iniciar
+              Confirmar
             </Button>
           </div>
         </DialogContent>
@@ -191,7 +217,7 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
       <Dialog open={isFinishModalOpen} onOpenChange={setIsFinishModalOpen}>
         <DialogContent className="mx-auto max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-xl">Finalizar campeonato</DialogTitle>
+            <DialogTitle className="text-xl">FINALIZAÇÃO</DialogTitle>
           </DialogHeader>
 
           <div className="mt-4 flex justify-between gap-2">
@@ -199,7 +225,7 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
               variant={"ghost"}
               onClick={() => setIsFinishModalOpen(false)}
             >
-              Sair
+              Fechar
             </Button>
             <Button
               onClick={() => {
@@ -208,7 +234,7 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
               disabled={!championship?.name}
             >
               {!championship?.name && <Loader2 className="animate-spin" />}
-              Iniciar
+              Confirmar
             </Button>
           </div>
         </DialogContent>
