@@ -59,15 +59,18 @@ export default function Championship() {
   const handleStartChampionship = async () => {
     setIsloadingStart(true);
 
+    const today = new Date();
+    const formattedDate = today.toLocaleDateString("pt-BR");
+
     const championshipPayload: CreateChampionship = {
-      name: "CAMPEONATO #1",
+      name: `CAMPEONATO #${formattedDate}`,
       blindTime: blindTime,
       price: price,
       playerIds: selectedPlayersId,
     };
 
     const championship = await createChampionship(championshipPayload);
-    console.log(championship, "championship");
+
     setIsloadingStart(false);
     router.push(`championship/${championship.id}`);
   };
