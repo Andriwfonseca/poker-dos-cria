@@ -53,6 +53,36 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
   const router = useRouter();
 
   useEffect(() => {
+    let wakeLockInstance: WakeLockSentinel | null = null;
+
+    const requestWakeLock = async () => {
+      try {
+        // Verifica se a API é suportada
+        if ("wakeLock" in navigator) {
+          wakeLockInstance = await navigator.wakeLock.request("screen");
+          console.log("Tela mantida ativa!");
+        } else {
+          console.warn("API Screen Wake Lock não suportada neste navegador.");
+        }
+      } catch (err) {
+        console.error("Erro ao solicitar wake lock:", err);
+      }
+    };
+
+    // Solicita o wake lock quando o componente é montado
+    requestWakeLock();
+
+    // Libera o wake lock quando o componente é desmontado
+    return () => {
+      if (wakeLockInstance) {
+        wakeLockInstance.release().then(() => {
+          console.log("Wake Lock liberado.");
+        });
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     const fetchChampionship = async () => {
       try {
         const championship = await getChampionship(championshipId);
