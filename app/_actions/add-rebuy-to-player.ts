@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/app/_lib/prisma";
-import { AddRebuyPlayer } from "./add-rebuy-player";
+import { AddRebuyPlayer } from "../_interfaces/add-rebuy-player";
 
 export const addRebuyToPlayer = async ({
   championshipId,

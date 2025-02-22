@@ -14,12 +14,10 @@ export const endChampionship = async ({
         id: championshipId,
       },
       data: {
-        firstPlaceId,
-        secondPlaceId,
+        ...(firstPlaceId && { firstPlaceId }),
+        ...(secondPlaceId && { secondPlaceId }),
       },
     });
-
-    console.log(updatedChampionship, "updatedChampionship");
 
     const championshipPlayers = await db.championshipPlayer.findMany({
       where: { championshipId },
@@ -36,15 +34,19 @@ export const endChampionship = async ({
       },
     });
 
+    const winnerIds = [firstPlaceId, secondPlaceId].filter(Boolean);
+
     // Atualiza primeiro e segundo colocado adicionando 1 vitória (wins)
-    await db.player.updateMany({
-      where: {
-        id: { in: [firstPlaceId, secondPlaceId] },
-      },
-      data: {
-        wins: { increment: 1 },
-      },
-    });
+    if (winnerIds.length > 0) {
+      await db.player.updateMany({
+        where: {
+          id: { in: winnerIds },
+        },
+        data: {
+          wins: { increment: 1 },
+        },
+      });
+    }
 
     return updatedChampionship;
   } catch (error) {
