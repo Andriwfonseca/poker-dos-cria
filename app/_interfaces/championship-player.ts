@@ -4,4 +4,5 @@ export interface ChampionshipPlayer {
   player: Player;
   championshipId: string;
   playerId: string;
+  rebuyCount: number;
 }

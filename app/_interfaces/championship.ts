@@ -5,7 +5,6 @@ export interface Championship {
   name: string;
   entryFee: number;
   blindTime: number;
-  rebuyPlayerId: string | null;
   firstPlaceId: string | null;
   secondPlaceId: string | null;
   players: ChampionshipPlayer[];

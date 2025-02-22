@@ -18,6 +18,8 @@ import { useRouter } from "next/navigation";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { Label } from "@/app/_components/ui/label";
 import { PlayerSelect } from "@/app/_components/player-select";
+import { addRebuyToPlayer } from "@/app/_actions/add-rebuy-to-player";
+import { endChampionship } from "@/app/_actions/end-championship";
 
 interface ChampionshipIdPageProps {
   params: Promise<{
@@ -34,17 +36,19 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
   const [level, setLevel] = useState(0);
   const [isStartModalOpen, setIsStartModalOpen] = useState(true);
-  const [isFinishModalOpen, setIsFinishModalOpen] = useState(false);
-  const [isReentryModalOpen, setIsReentryModalOpen] = useState(false);
+  const [isEndModalOpen, setIsEndModalOpen] = useState(false);
+  const [isRebuyModalOpen, setIsRebuyModalOpen] = useState(false);
   const [playerList, setPlayerList] = useState<
     { title: string; value: string }[]
   >([{ title: "", value: "" }]);
-  const [selectedPlayerReentry, setSelectedPlayerReentry] =
-    useState<string>("");
+  const [selectedPlayerRebuy, setSelectedPlayerRebuy] = useState<string>("");
   const [selectedPlayerFirstPlace, setSelectedPlayerFirstPlace] =
     useState<string>("");
   const [selectedPlayerSecondPlace, setSelectedPlayerSecondPlace] =
     useState<string>("");
+  const [isLoadingRebuy, setIsLoadingRebuy] = useState(false);
+  const [isLoadingEndChampionship, setIsLoadingEndChampionship] =
+    useState(false);
 
   const router = useRouter();
 
@@ -107,30 +111,40 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
     }
   };
 
-  const handlePlayerReentryChange = (value: string) => {
-    setSelectedPlayerReentry(value);
-    console.log("Jogador selecionado reentrada", selectedPlayerReentry);
+  const handlePlayerRebuyChange = (value: string) => {
+    setSelectedPlayerRebuy(value);
   };
 
   const handlePlayerFirstPlaceChange = (value: string) => {
     setSelectedPlayerFirstPlace(value);
-    console.log(
-      "Jogador selecionado primeiro lugar:",
-      selectedPlayerFirstPlace
-    );
   };
 
   const handlePlayerSecondPlaceChange = (value: string) => {
     setSelectedPlayerSecondPlace(value);
-    console.log(
-      "Jogador selecionado segundo lugar:",
-      selectedPlayerSecondPlace
-    );
   };
 
-  /* const handleFinishChampionship = () => {};
+  const handleEndChampionship = async () => {
+    setIsLoadingEndChampionship(true);
 
-  const handleReentry = () => {};*/
+    await endChampionship({
+      championshipId,
+      firstPlaceId: selectedPlayerFirstPlace,
+      secondPlaceId: selectedPlayerSecondPlace,
+    });
+
+    setIsLoadingEndChampionship(false);
+
+    router.push("/");
+  };
+
+  const handleRebuy = async () => {
+    setIsLoadingRebuy(true);
+
+    await addRebuyToPlayer({ championshipId, playerId: selectedPlayerRebuy });
+
+    setIsLoadingRebuy(false);
+    setIsRebuyModalOpen(false);
+  };
 
   useEffect(() => {
     return () => {
@@ -165,14 +179,14 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
 
       <footer className="mx-auto max-w-md flex justify-between mt-auto py-4 gap-x-4">
         <Button
-          onClick={() => setIsFinishModalOpen(true)}
+          onClick={() => setIsEndModalOpen(true)}
           className="rounded bg-[#509B52] hover:bg-green-600 px-4 py-2 text-white w-44 gap-3"
         >
           FINALIZAR
         </Button>
         <Button
           variant={"secondary"}
-          onClick={() => setIsReentryModalOpen(true)}
+          onClick={() => setIsRebuyModalOpen(true)}
           className="rounded px-4 py-2"
         >
           REENTRADA
@@ -206,8 +220,8 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
         </DialogContent>
       </Dialog>
 
-      {/* Modal reentry */}
-      <Dialog open={isReentryModalOpen} onOpenChange={setIsReentryModalOpen}>
+      {/* Modal rebuy */}
+      <Dialog open={isRebuyModalOpen} onOpenChange={setIsRebuyModalOpen}>
         <DialogContent className="mx-auto max-w-sm">
           <DialogHeader>
             <DialogTitle className="text-xl">REENTRADA</DialogTitle>
@@ -223,7 +237,7 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
               </Label>
               <PlayerSelect
                 players={playerList}
-                onValueChange={handlePlayerReentryChange}
+                onValueChange={handlePlayerRebuyChange}
               />
             </div>
           </div>
@@ -231,23 +245,20 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
           <div className="mt-4 flex justify-between gap-2">
             <Button
               variant={"ghost"}
-              onClick={() => setIsReentryModalOpen(false)}
+              onClick={() => setIsRebuyModalOpen(false)}
             >
               Fechar
             </Button>
-            <Button
-              onClick={() => console.log(selectedPlayerReentry)}
-              disabled={!championship?.name}
-            >
-              {!championship?.name && <Loader2 className="animate-spin" />}
+            <Button onClick={handleRebuy} disabled={isLoadingRebuy}>
+              {isLoadingRebuy && <Loader2 className="animate-spin" />}
               Confirmar
             </Button>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* Modal finish */}
-      <Dialog open={isFinishModalOpen} onOpenChange={setIsFinishModalOpen}>
+      {/* Modal end */}
+      <Dialog open={isEndModalOpen} onOpenChange={setIsEndModalOpen}>
         <DialogContent className="mx-auto max-w-sm">
           <DialogHeader>
             <DialogTitle className="text-xl">FINALIZAÇÃO</DialogTitle>
@@ -278,19 +289,14 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
           </div>
 
           <div className="mt-4 flex justify-between gap-2">
-            <Button
-              variant={"ghost"}
-              onClick={() => setIsFinishModalOpen(false)}
-            >
+            <Button variant={"ghost"} onClick={() => setIsEndModalOpen(false)}>
               Fechar
             </Button>
             <Button
-              onClick={() => {
-                setIsFinishModalOpen(false);
-              }}
-              disabled={!championship?.name}
+              onClick={handleEndChampionship}
+              disabled={isLoadingEndChampionship}
             >
-              {!championship?.name && <Loader2 className="animate-spin" />}
+              {isLoadingEndChampionship && <Loader2 className="animate-spin" />}
               Confirmar
             </Button>
           </div>
