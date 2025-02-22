@@ -72,7 +72,7 @@ export default function Championship() {
     const championship = await createChampionship(championshipPayload);
 
     setIsloadingStart(false);
-    router.push(`championship/${championship.id}`);
+    router.push(`play/${championship.id}`);
   };
 
   return (
@@ -195,7 +195,7 @@ export default function Championship() {
                 Cancelar
               </Button>
               <Button
-                disabled={isloadingStart}
+                disabled={isloadingStart || selectedPlayersId.length == 0}
                 onClick={handleStartChampionship}
               >
                 {isloadingStart && <Loader2 className="animate-spin" />}
