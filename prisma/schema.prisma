@@ -15,7 +15,6 @@ model Player {
   matches       Int                  @default(0)
   championships ChampionshipPlayer[]
 
-  rebuyChampionships       Championship[] @relation("RebuyPlayer")
   firstPlaceChampionships  Championship[] @relation("FirstPlace")
   secondPlaceChampionships Championship[] @relation("SecondPlace")
 }
@@ -28,9 +27,6 @@ model Championship {
 
   players ChampionshipPlayer[]
 
-  rebuyPlayerId String?
-  rebuyPlayer   Player? @relation("RebuyPlayer", fields: [rebuyPlayerId], references: [id])
-
   firstPlaceId String?
   firstPlace   Player? @relation("FirstPlace", fields: [firstPlaceId], references: [id])
 
@@ -41,8 +37,10 @@ model Championship {
 model ChampionshipPlayer {
   playerId       String
   championshipId String
-  player         Player       @relation(fields: [playerId], references: [id], onDelete: Cascade)
-  championship   Championship @relation(fields: [championshipId], references: [id], onDelete: Cascade)
+  rebuyCount     Int    @default(0)
+
+  player       Player       @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  championship Championship @relation(fields: [championshipId], references: [id], onDelete: Cascade)
 
   @@id([playerId, championshipId])
 }
