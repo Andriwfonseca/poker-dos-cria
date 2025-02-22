@@ -47,14 +47,14 @@ const CardChampionship = ({
           <div className="space-y-2">
             {firstPlacePlayer?.player.name && (
               <div className="space-x-2 flex">
-                <span className="font-medium">1 Lugar:</span>
+                <span className="font-medium">1º Lugar:</span>
                 <Badge>{firstPlacePlayer.player.name}</Badge>
               </div>
             )}
 
             {secondPlacePlayer?.player.name && (
               <div className="space-x-2 flex">
-                <span className="font-medium">2 Lugar:</span>
+                <span className="font-medium">2º Lugar:</span>
                 <Badge>{secondPlacePlayer.player.name}</Badge>
               </div>
             )}
