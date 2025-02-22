@@ -5,7 +5,7 @@ import { Button } from "@/app/_components/ui/button";
 import { Championship } from "@/app/_interfaces/championship";
 import { ChampionshipPlayer } from "@/app/_interfaces/championship-player";
 import { formatMinutesToTime } from "@/app/_utils/format-minutes-to-time";
-import { use, useEffect, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import { BLINDS } from "./_constants/blinds";
 import {
   Dialog,
@@ -49,6 +49,7 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
   const [isLoadingRebuy, setIsLoadingRebuy] = useState(false);
   const [isLoadingEndChampionship, setIsLoadingEndChampionship] =
     useState(false);
+  const alarmSoundRef = useRef<HTMLAudioElement | null>(null);
 
   const router = useRouter();
 
@@ -83,6 +84,8 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
   }, []);
 
   useEffect(() => {
+    stopAlarm();
+
     const fetchChampionship = async () => {
       try {
         const championship = await getChampionship(championshipId);
@@ -176,6 +179,20 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
     setIsRebuyModalOpen(false);
   };
 
+  const playAlarm = () => {
+    alarmSoundRef.current = new Audio("/sounds/alarm.wav");
+    alarmSoundRef.current.play().catch((error) => {
+      console.error("Erro ao reproduzir o som:", error);
+    });
+  };
+
+  const stopAlarm = () => {
+    if (alarmSoundRef.current) {
+      alarmSoundRef.current.pause();
+      alarmSoundRef.current.currentTime = 0;
+    }
+  };
+
   useEffect(() => {
     return () => {
       if (intervalId) {
@@ -185,7 +202,8 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
   }, [intervalId]);
 
   useEffect(() => {
-    if (timer === 0) {
+    if (timer === 0 && championship?.name) {
+      playAlarm();
       setIsStartModalOpen(true);
     }
   }, [timer]);
@@ -233,12 +251,19 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
           </DialogHeader>
 
           <div className="mt-4 flex justify-between gap-2">
-            <Button variant={"ghost"} onClick={() => router.push("/")}>
+            <Button
+              variant={"ghost"}
+              onClick={() => {
+                stopAlarm();
+                router.push("/");
+              }}
+            >
               Sair
             </Button>
             <Button
               onClick={() => {
                 setIsStartModalOpen(false);
+                stopAlarm();
                 handleRestartTimer();
               }}
               disabled={!championship?.name}
