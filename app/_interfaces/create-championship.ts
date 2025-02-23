@@ -3,4 +3,5 @@ export interface CreateChampionship {
   blindTime: number;
   price: number;
   playerIds: string[];
+  startTime: Date;
 }

@@ -67,6 +67,7 @@ export default function Championship() {
       blindTime: blindTime,
       price: price,
       playerIds: selectedPlayersId,
+      startTime: today,
     };
 
     const championship = await createChampionship(championshipPayload);

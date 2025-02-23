@@ -32,6 +32,9 @@ model Championship {
 
   secondPlaceId String?
   secondPlace   Player? @relation("SecondPlace", fields: [secondPlaceId], references: [id])
+
+  startTime DateTime?
+  endTime   DateTime?
 }
 
 model ChampionshipPlayer {

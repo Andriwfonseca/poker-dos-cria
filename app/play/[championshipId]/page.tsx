@@ -2,7 +2,7 @@
 
 import { getChampionship } from "@/app/_actions/get-championship";
 import { Button } from "@/app/_components/ui/button";
-import { Championship } from "@/app/_interfaces/championship";
+import { ChampionshipProps } from "@/app/_interfaces/championship-props";
 import { ChampionshipPlayer } from "@/app/_interfaces/championship-player";
 import { formatMinutesToTime } from "@/app/_utils/format-minutes-to-time";
 import { use, useEffect, useRef, useState } from "react";
@@ -31,7 +31,9 @@ interface ChampionshipIdPageProps {
 const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
   const { championshipId } = use(params);
 
-  const [championship, setChampionship] = useState<Championship | undefined>();
+  const [championship, setChampionship] = useState<
+    ChampionshipProps | undefined
+  >();
   const [players, setPlayers] = useState<ChampionshipPlayer[]>([]);
   const [timer, setTimer] = useState(0);
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
@@ -190,10 +192,12 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
   const handleEndChampionship = async () => {
     setIsLoadingEndChampionship(true);
 
+    const today = new Date();
     await endChampionship({
       championshipId,
       firstPlaceId: selectedPlayerFirstPlace,
       secondPlaceId: selectedPlayerSecondPlace,
+      endTime: today,
     });
 
     setIsLoadingEndChampionship(false);

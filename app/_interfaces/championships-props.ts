@@ -5,4 +5,6 @@ export interface ChampionshipsProps {
   firstPlaceId: string | null;
   secondPlaceId: string | null;
   players: ChampionshipPlayer[];
+  startTime: Date | null;
+  endTime: Date | null;
 }

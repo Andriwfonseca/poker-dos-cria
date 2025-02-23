@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import BackButton from "../(home)/_components/back-button";
 import CardChampionship from "./_components/card-championship";
 import { getChampionships } from "../_actions/get-championships";
-import { Championship } from "../_interfaces/championship";
+import { ChampionshipProps } from "../_interfaces/championship-props";
 
 const ChampionshipsPage = () => {
-  const [championships, setChampionships] = useState<Championship[]>();
+  const [championships, setChampionships] = useState<ChampionshipProps[]>();
 
   useEffect(() => {
     const fetchChampionships = async () => {
@@ -33,6 +33,8 @@ const ChampionshipsPage = () => {
                 firstPlaceId={c.firstPlaceId}
                 secondPlaceId={c.secondPlaceId}
                 players={c.players}
+                startTime={c.startTime}
+                endTime={c.endTime}
               />
             ))}
         </div>

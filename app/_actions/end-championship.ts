@@ -7,6 +7,7 @@ export const endChampionship = async ({
   championshipId,
   firstPlaceId,
   secondPlaceId,
+  endTime,
 }: EndChampionshipProps) => {
   try {
     const updatedChampionship = await db.championship.update({
@@ -16,6 +17,7 @@ export const endChampionship = async ({
       data: {
         ...(firstPlaceId && { firstPlaceId }),
         ...(secondPlaceId && { secondPlaceId }),
+        endTime,
       },
     });
 

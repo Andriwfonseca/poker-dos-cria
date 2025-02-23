@@ -1,6 +1,6 @@
 import { ChampionshipPlayer } from "./championship-player";
 
-export interface Championship {
+export interface ChampionshipProps {
   id: string;
   name: string;
   entryFee: number;
@@ -8,4 +8,6 @@ export interface Championship {
   firstPlaceId: string | null;
   secondPlaceId: string | null;
   players: ChampionshipPlayer[];
+  startTime: Date | null;
+  endTime: Date | null;
 }

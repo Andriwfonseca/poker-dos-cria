@@ -17,6 +17,7 @@ export const createChampionship = async (
             player: { connect: { id } },
           })),
         },
+        startTime: championshipPayload.startTime,
       },
       include: {
         players: {

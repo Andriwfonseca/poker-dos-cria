@@ -2,12 +2,15 @@ import { Badge } from "@/app/_components/ui/badge";
 import { Card } from "@/app/_components/ui/card";
 import { Input } from "@/app/_components/ui/input";
 import { ChampionshipsProps } from "@/app/_interfaces/championships-props";
+import { formatDate } from "@/app/_utils/format-date";
 
 const CardChampionship = ({
   name,
   players,
   firstPlaceId,
   secondPlaceId,
+  startTime,
+  endTime,
 }: ChampionshipsProps) => {
   const playerNames = players.map((p) => p.player.name);
   const firstPlacePlayer = players.find((p) => p.playerId == firstPlaceId);
@@ -24,6 +27,18 @@ const CardChampionship = ({
   return (
     <Card className="cursor-pointer p-4 transition-colors hover:bg-gray-50">
       <h2 className="mb-1 text-lg font-medium">{name}</h2>
+      {startTime && endTime && (
+        <div>
+          <div className="flex space-x-2">
+            <div>Início:</div>
+            <div className="text-muted-foreground">{formatDate(startTime)}</div>
+          </div>
+          <div className="flex space-x-2">
+            <div>Fim:</div>
+            <div className="text-muted-foreground">{formatDate(endTime)}</div>
+          </div>
+        </div>
+      )}
       <div className="space-y-1 text-sm">
         <div className="space-y-4">
           <div className="space-x-2 flex mt-2">
