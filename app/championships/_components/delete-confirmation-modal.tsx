@@ -29,10 +29,10 @@ export const DeleteConfirmationModal = ({
         </DialogHeader>
         <p>Tem certeza que deseja remover este campeonato?</p>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} disabled={loading}>
             Cancelar
           </Button>
-          <Button variant="destructive" onClick={onConfirm}>
+          <Button variant="destructive" onClick={onConfirm} disabled={loading}>
             {loading ? (
               <div className="flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" /> Deletando...

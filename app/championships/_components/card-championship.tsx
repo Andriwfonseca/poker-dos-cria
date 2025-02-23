@@ -25,7 +25,7 @@ const CardChampionship = ({
   const hasRebuy = rebuys.some((r) => r.count > 0);
 
   return (
-    <Card className="cursor-pointer p-4 transition-colors hover:bg-gray-50">
+    <Card className="cursor-pointer mt-2 p-4 transition-colors hover:bg-gray-50">
       <h2 className="mb-1 text-lg font-medium">{name}</h2>
       {startTime && endTime && (
         <div>

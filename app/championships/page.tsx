@@ -14,6 +14,7 @@ import {
 import { EditChampionshipModal } from "./_components/edit-championship-modal";
 import { DeleteConfirmationModal } from "./_components/delete-confirmation-modal";
 import { Pencil, Trash2 } from "lucide-react";
+import { deleteChampionship } from "../_actions/delete-championship";
 
 const ChampionshipsPage = () => {
   const [championships, setChampionships] = useState<ChampionshipProps[]>();
@@ -60,7 +61,7 @@ const ChampionshipsPage = () => {
   const handleDeleteChampionship = async (championshipId: string) => {
     setLoading(true);
     try {
-      //chamar api de delete
+      await deleteChampionship(championshipId);
 
       setChampionships((prev) => prev?.filter((c) => c.id !== championshipId));
 
@@ -78,7 +79,7 @@ const ChampionshipsPage = () => {
         <h1 className="mb-6 text-center text-4xl font-bold text-white">
           Campeonatos
         </h1>
-        <div className="space-y-2">
+        <div>
           {championships &&
             championships.map((c) => (
               <ContextMenu key={c.id}>
