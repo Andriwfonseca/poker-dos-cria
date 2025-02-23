@@ -3,6 +3,7 @@ import { Card } from "@/app/_components/ui/card";
 import { Input } from "@/app/_components/ui/input";
 import { ChampionshipsProps } from "@/app/_interfaces/championships-props";
 import { formatDate } from "@/app/_utils/format-date";
+import { roundToNearest } from "@/app/_utils/round-to-nearest";
 
 const CardChampionship = ({
   name,
@@ -11,18 +12,29 @@ const CardChampionship = ({
   secondPlaceId,
   startTime,
   endTime,
+  entryFee,
 }: ChampionshipsProps) => {
   const playerNames = players.map((p) => p.player.name);
   const firstPlacePlayer = players.find((p) => p.playerId == firstPlaceId);
   const secondPlacePlayer = players.find((p) => p.playerId == secondPlaceId);
-  const rebuys = players.map((p) => {
-    return {
-      name: p.player.name,
-      count: p.rebuyCount,
-    };
-  });
+  const rebuys = players
+    .filter((p) => p.rebuyCount > 0)
+    .map((p) => {
+      return {
+        name: p.player.name,
+        count: p.rebuyCount,
+      };
+    });
 
-  const hasRebuy = rebuys.some((r) => r.count > 0);
+  const hasRebuy = rebuys.length > 0;
+
+  const totalPrize = entryFee * (players.length + rebuys.length);
+
+  let firstPlacePrize = totalPrize * 0.65;
+  let secondPlacePrize = totalPrize * 0.35;
+
+  firstPlacePrize = roundToNearest(firstPlacePrize, entryFee);
+  secondPlacePrize = roundToNearest(secondPlacePrize, entryFee);
 
   return (
     <Card className="cursor-pointer mt-2 p-4 transition-colors hover:bg-gray-50">
@@ -39,6 +51,10 @@ const CardChampionship = ({
           </div>
         </div>
       )}
+      <div className="flex space-x-2">
+        <div>Valor da entrada: </div>
+        <div className="text-muted-foreground">{entryFee} reais</div>
+      </div>
       <div className="space-y-1 text-sm">
         <div className="space-y-4">
           <div className="space-x-2 flex mt-2">
@@ -70,6 +86,9 @@ const CardChampionship = ({
                 <div className="space-x-2 flex">
                   <span className="font-medium">1º Lugar:</span>
                   <Badge>{firstPlacePlayer.player.name}</Badge>
+                  <div className="text-muted-foreground">
+                    {firstPlacePrize} reais
+                  </div>
                 </div>
               )}
 
@@ -77,6 +96,9 @@ const CardChampionship = ({
                 <div className="space-x-2 flex">
                   <span className="font-medium">2º Lugar:</span>
                   <Badge>{secondPlacePlayer.player.name}</Badge>
+                  <div className="text-muted-foreground">
+                    {secondPlacePrize} reais
+                  </div>
                 </div>
               )}
             </div>

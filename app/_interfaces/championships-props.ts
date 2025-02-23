@@ -7,4 +7,5 @@ export interface ChampionshipsProps {
   players: ChampionshipPlayer[];
   startTime: Date | null;
   endTime: Date | null;
+  entryFee: number;
 }

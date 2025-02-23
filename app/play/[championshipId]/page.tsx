@@ -21,6 +21,7 @@ import { PlayerSelect } from "@/app/_components/player-select";
 import { addRebuyToPlayer } from "@/app/_actions/add-rebuy-to-player";
 import { endChampionship } from "@/app/_actions/end-championship";
 import { Card } from "@/app/_components/ui/card";
+import { roundToNearest } from "@/app/_utils/round-to-nearest";
 
 interface ChampionshipIdPageProps {
   params: Promise<{
@@ -99,16 +100,12 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
     fetchChampionship();
   }, [championshipId]);
 
-  const roundToNearest5 = (value: number, entryFee: number) => {
-    return Math.round(value / entryFee) * entryFee;
-  };
-
   const updatePrizes = (totalPrize: number, entryFee: number) => {
     let firstPlacePrize = totalPrize * 0.65;
     let secondPlacePrize = totalPrize * 0.35;
 
-    firstPlacePrize = roundToNearest5(firstPlacePrize, entryFee);
-    secondPlacePrize = roundToNearest5(secondPlacePrize, entryFee);
+    firstPlacePrize = roundToNearest(firstPlacePrize, entryFee);
+    secondPlacePrize = roundToNearest(secondPlacePrize, entryFee);
 
     setPrizes({
       totalPrize,

@@ -91,6 +91,7 @@ const ChampionshipsPage = () => {
                     players={c.players}
                     startTime={c.startTime}
                     endTime={c.endTime}
+                    entryFee={c.entryFee}
                   />
                 </ContextMenuTrigger>
                 <ContextMenuContent>
