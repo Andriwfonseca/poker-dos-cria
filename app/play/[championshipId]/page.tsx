@@ -20,6 +20,7 @@ import { Label } from "@/app/_components/ui/label";
 import { PlayerSelect } from "@/app/_components/player-select";
 import { addRebuyToPlayer } from "@/app/_actions/add-rebuy-to-player";
 import { endChampionship } from "@/app/_actions/end-championship";
+import { Card } from "@/app/_components/ui/card";
 
 interface ChampionshipIdPageProps {
   params: Promise<{
@@ -50,10 +51,71 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
   const [isLoadingEndChampionship, setIsLoadingEndChampionship] =
     useState(false);
   const alarmSoundRef = useRef<HTMLAudioElement | null>(null);
+  const [prizes, setPrizes] = useState({
+    totalPrize: 0,
+    firstPlace: 0,
+    secondPlace: 0,
+  });
 
   const router = useRouter();
 
   useEffect(() => {
+    callWakeLock();
+  }, []);
+
+  useEffect(() => {
+    stopAlarm();
+
+    const fetchChampionship = async () => {
+      try {
+        const championship = await getChampionship(championshipId);
+
+        if (championship) {
+          setChampionship(championship);
+          setTimer(championship.blindTime * 60);
+          const totalPrize =
+            championship.entryFee * championship.players.length;
+          updatePrizes(totalPrize, championship.entryFee);
+        }
+
+        if (championship?.players) {
+          setPlayers(championship.players);
+
+          const formattedPlayerList = championship.players.map((p) => ({
+            title: p.player.name,
+            value: p.player.id,
+          }));
+
+          setPlayerList(formattedPlayerList);
+        } else {
+          setPlayers([]);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchChampionship();
+  }, [championshipId]);
+
+  const roundToNearest5 = (value: number, entryFee: number) => {
+    return Math.round(value / entryFee) * entryFee;
+  };
+
+  const updatePrizes = (totalPrize: number, entryFee: number) => {
+    let firstPlacePrize = totalPrize * 0.65;
+    let secondPlacePrize = totalPrize * 0.35;
+
+    firstPlacePrize = roundToNearest5(firstPlacePrize, entryFee);
+    secondPlacePrize = roundToNearest5(secondPlacePrize, entryFee);
+
+    setPrizes({
+      totalPrize,
+      firstPlace: firstPlacePrize,
+      secondPlace: secondPlacePrize,
+    });
+  };
+
+  const callWakeLock = () => {
     let wakeLockInstance: WakeLockSentinel | null = null;
 
     const requestWakeLock = async () => {
@@ -81,38 +143,7 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
         });
       }
     };
-  }, []);
-
-  useEffect(() => {
-    stopAlarm();
-
-    const fetchChampionship = async () => {
-      try {
-        const championship = await getChampionship(championshipId);
-
-        if (championship) {
-          setChampionship(championship);
-          setTimer(championship.blindTime * 60);
-        }
-
-        if (championship?.players) {
-          setPlayers(championship.players);
-
-          const formattedPlayerList = championship.players.map((p) => ({
-            title: p.player.name,
-            value: p.player.id,
-          }));
-
-          setPlayerList(formattedPlayerList);
-        } else {
-          setPlayers([]);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchChampionship();
-  }, [championshipId]);
+  };
 
   const handleStartTimer = () => {
     if (intervalId) {
@@ -175,6 +206,11 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
 
     await addRebuyToPlayer({ championshipId, playerId: selectedPlayerRebuy });
 
+    if (championship) {
+      const totalPrize = prizes.totalPrize + championship?.entryFee;
+      updatePrizes(totalPrize, championship.entryFee);
+    }
+
     setIsLoadingRebuy(false);
     setIsRebuyModalOpen(false);
   };
@@ -212,7 +248,17 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
     <div className="min-h-screen bg-[#020817] px-4 py-8 flex flex-col">
       <div className="mx-auto max-w-md flex-1">
         <h1 className="mb-6 text-center text-4xl font-bold text-white">
-          <span>{championship?.name}</span>
+          <div className="flex flex-col items-center">
+            <span>{championship?.name}</span>
+            <Button
+              size={"sm"}
+              onClick={callWakeLock}
+              className="w-max"
+              variant={"default"}
+            >
+              Deixar tela ligada
+            </Button>
+          </div>
           <div className="mt-10 text-8xl">{formatMinutesToTime(timer)}</div>
           <div className="mt-5 text-2xl">Nível {level}</div>
           <div className="mt-5">SB / BB</div>
@@ -221,9 +267,24 @@ const ChampionshipIdPage = ({ params }: ChampionshipIdPageProps) => {
             {level > 0 && BLINDS[level - 1].big}
           </div>
         </h1>
+        {players && (
+          <Card className="mx-4">
+            <div className="mx-6">
+              <h1 className="text-center">
+                Prêmio total: {prizes.totalPrize} reais
+              </h1>
+              <div className="flex justify-between">
+                <h1 className="text-xl">1º Lugar</h1>
+                <div className="text-xl">{prizes.firstPlace} reais</div>
+              </div>
+              <div className="flex justify-between">
+                <h1 className="text-xl">2º Lugar</h1>
+                <div className="text-xl">{prizes.secondPlace} reais</div>
+              </div>
+            </div>
+          </Card>
+        )}
       </div>
-
-      {players && <div>{/**apagar depois eslint*/}</div>}
 
       <footer className="mx-auto max-w-md flex justify-between mt-auto py-4 gap-x-4">
         <Button
