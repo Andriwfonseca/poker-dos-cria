@@ -19,6 +19,8 @@ const CardChampionship = ({
     };
   });
 
+  const hasRebuy = rebuys.some((r) => r.count > 0);
+
   return (
     <Card className="cursor-pointer p-4 transition-colors hover:bg-gray-50">
       <h2 className="mb-1 text-lg font-medium">{name}</h2>
@@ -32,33 +34,38 @@ const CardChampionship = ({
               ))}
             </div>
           </div>
-          <div className="space-y-2">
-            <span className="font-medium">Reentradas:</span>
-            {rebuys.map((rebuy, i) => {
-              if (rebuy.count === 0) return null;
-              return (
-                <div key={i} className="flex space-x-2">
-                  <Badge>{rebuy.name}</Badge>
-                  <Input id="rebuy" value={rebuy.count} disabled={true} />
-                </div>
-              );
-            })}
-          </div>
-          <div className="space-y-2">
-            {firstPlacePlayer?.player.name && (
-              <div className="space-x-2 flex">
-                <span className="font-medium">1º Lugar:</span>
-                <Badge>{firstPlacePlayer.player.name}</Badge>
-              </div>
-            )}
+          {hasRebuy && (
+            <div className="space-y-2">
+              <span className="font-medium">Reentradas:</span>
+              {rebuys.map((rebuy, i) => {
+                if (rebuy.count === 0) return null;
+                return (
+                  <div key={i} className="flex space-x-2">
+                    <Badge>{rebuy.name}</Badge>
+                    <Input id="rebuy" value={rebuy.count} disabled={true} />
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
-            {secondPlacePlayer?.player.name && (
-              <div className="space-x-2 flex">
-                <span className="font-medium">2º Lugar:</span>
-                <Badge>{secondPlacePlayer.player.name}</Badge>
-              </div>
-            )}
-          </div>
+          {firstPlacePlayer && (
+            <div className="space-y-2">
+              {firstPlacePlayer?.player.name && (
+                <div className="space-x-2 flex">
+                  <span className="font-medium">1º Lugar:</span>
+                  <Badge>{firstPlacePlayer.player.name}</Badge>
+                </div>
+              )}
+
+              {secondPlacePlayer?.player.name && (
+                <div className="space-x-2 flex">
+                  <span className="font-medium">2º Lugar:</span>
+                  <Badge>{secondPlacePlayer.player.name}</Badge>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </Card>

@@ -24,14 +24,18 @@ const ChampionshipsPage = () => {
         <h1 className="mb-6 text-center text-4xl font-bold text-white">
           Campeonatos
         </h1>
-        {championships && (
-          <CardChampionship
-            name={championships[0].name}
-            firstPlaceId={championships[0].firstPlaceId}
-            secondPlaceId={championships[0].secondPlaceId}
-            players={championships[0].players}
-          />
-        )}
+        <div className="space-y-2">
+          {championships &&
+            championships.map((c) => (
+              <CardChampionship
+                key={c.id}
+                name={c.name}
+                firstPlaceId={c.firstPlaceId}
+                secondPlaceId={c.secondPlaceId}
+                players={c.players}
+              />
+            ))}
+        </div>
         <div className="mt-4">
           <BackButton url="/" title="Voltar" />
         </div>
