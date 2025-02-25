@@ -49,6 +49,7 @@ export default function PokerApp() {
               <Button
                 variant="outline"
                 className="w-full bg-white hover:bg-gray-100 text-black font-medium py-6"
+                onClick={() => router.push("/ranking")}
               >
                 <MedalIcon />
                 RANKING
