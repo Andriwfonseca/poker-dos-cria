@@ -28,7 +28,11 @@ const CardChampionship = ({
 
   const hasRebuy = rebuys.length > 0;
 
-  const totalPrize = entryFee * (players.length + rebuys.length);
+  const totalRebuys = rebuys.reduce((accumulator, currentValue) => {
+    return accumulator + currentValue.count;
+  }, 0);
+
+  const totalPrize = entryFee * (players.length + totalRebuys);
 
   let firstPlacePrize = totalPrize * 0.65;
   let secondPlacePrize = totalPrize * 0.35;
